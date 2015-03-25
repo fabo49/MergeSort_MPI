@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     int numProcesos;            /* Va a guardar la cantidad de procesos que el usuario quiere ejecutar. */
     int numElementos;           /* Va a guardar la cantidad de elementos que el usuario quiere que tenga el vector*/
     bool compatibles = false;
-    int tamVecTmp;              /* Cantidad de elementos que se destinan a cada proceso
+    int tamVecTmp;              /* Cantidad de elementos que se destinan a cada proceso */
 
     //ingreso de datos y comprobacion de compatibilidad
     while(compatibles == false){
@@ -58,11 +58,13 @@ int main(int argc, char **argv)
             numeros = to_string(valor);
             numerosDesorden << numeros+" " << endl;                     // Se llena el archivo con valores random
         }
+        
+        
 
         
     }else{
 
-        metodoOrde.mergeSort(arrayTemporal, 16);                             // Envio a ordenar lo que me corresponde a mi
+        
 
 
     }
