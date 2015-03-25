@@ -15,6 +15,7 @@ int main(int argc, char **argv)
     int numProcesos;            /* Va a guardar la cantidad de procesos que el usuario quiere ejecutar. */
     int numElementos;           /* Va a guardar la cantidad de elementos que el usuario quiere que tenga el vector*/
     bool compatibles = false;
+    int tamVecTmp;              /* Cantidad de elementos que se destinan a cada proceso
 
     //ingreso de datos y comprobacion de compatibilidad
     while(compatibles == false){
@@ -37,35 +38,30 @@ int main(int argc, char **argv)
     MPI_Comm_size(MPI_COMM_WORLD, &numProcesos);                         /* El comunicador MPI_COMM_WORLD almacena el numero de procesos a ejecutar en la 
                                                                             variable numProcesos */
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);                             /* El comunicador MPI_COMM_WORLD almacena en la variable my_rank la etiqueta del 
-                                                                            proceso que realiza el llamado. */
-
-    int arrayDesorden[numElementos];                                              // Array que almacena todos los numeros en desorden
-    int arrayTemporal[128];                                              // Array que usa cada proceso para guardar los numeros que la raiz envia
-    string numeros = "";
-    int valor = 0;
-    srand(time(NULL));
-
-    ofstream numerosDesorden;                                           // Objeto Archivo
-
-    numerosDesorden.open("ListaI.txt");                                 // Se crea el archivo que contiene los numeros en desorden
-    numerosDesorden << "Números en desorden: " << endl;
+                                                                           proceso que realiza el llamado. */
 
     if(my_rank==0){                                                      // Proceso raiz 0
+    
+        int arrayDesorden[numElementos];                                              // Array que almacena todos los numeros en desorden
+        string numeros = "";
+        int valor = 0;
+        srand(time(NULL));
 
-        for(int i = 0; i < 128; ++i){                                   // Se generan todos los numeros random
+        ofstream numerosDesorden;                                           // Objeto Archivo
+
+        numerosDesorden.open("ListaI.txt");                                 // Se crea el archivo que contiene los numeros en desorden
+        numerosDesorden << "Números en desorden: " << endl;
+
+        for(int i = 0; i < numElementos; ++i){                                   // Se generan todos los numeros random
             valor = (i* (rand()%10+1) );
             arrayDesorden[i] = valor;
             numeros = to_string(valor);
             numerosDesorden << numeros+" " << endl;                     // Se llena el archivo con valores random
         }
+
         
-        MPI_Bcast(arrayDesorden, 16, MPI_INT, 0, MPI_COMM_WORLD);             // Encargado de entregar a cada proceso una cierta cantidad equitativa de elementos para que los ordene
-
-
     }else{
-        
-        MPI_Recv(arrayTemporal, 16, MPI_INT, 0, 911, MPI_COMM_WORLD, &status);      // Cada proceso recibe de la raiz los numeros iniciales a ordenar
-        //MPI_Recv(arrayTemporal, 16, MPI_INT, 0, ANI
+
         metodoOrde.mergeSort(arrayTemporal, 16);                             // Envio a ordenar lo que me corresponde a mi
 
 
