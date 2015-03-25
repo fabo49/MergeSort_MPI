@@ -15,6 +15,7 @@ int main(int argc, char **argv)
 
 
     int arrayDesorden[128];                                              // Array que almacena todos los numeros en desorden
+    int arrayTemporal[128];                                              // Array que usa cada proceso para guardar los numeros que la raiz envia
     string numeros = "";
     int valor = 0;
     srand(time(NULL));
@@ -33,11 +34,12 @@ int main(int argc, char **argv)
             numerosDesorden << numeros+" " << endl;                     // Se llena el archivo con valores random
         }
         
-        MPI_Bcast(array, 16, MPI_INT, 0, MPI_COMM_WORLD);             // Encargado de entregar a cada proceso una cierta cantidad equitativa de elementos para que los ordene
+        MPI_Bcast(arrayDesorden, 16, MPI_INT, 0, MPI_COMM_WORLD);             // Encargado de entregar a cada proceso una cierta cantidad equitativa de elementos para que los ordene
 
 
     }else{
         
+        MPI_Recv(arrayTemporal, 16, MPI_INT, 0, 911, MPI_COMM_WORLD, &status);      // Cada proceso recibe de la raiz los numeros iniciales a ordenar
         
 
 
