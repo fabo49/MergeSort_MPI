@@ -23,7 +23,7 @@ int main(int argc, char **argv)
         cout<<"\nIngrese la cantidad de procesos que quiere crear para correr el programa: ";
         cin>>numProcesos;
         cout<<endl;
-        if(numElementos % numProcesos == 0){
+        if( (numElementos % numProcesos == 0) && (numProcesos <= 32) ){
             compatibles = true;
         }else{
             cout<<"Los datos ingresados no funcionan, la cantidad de elementos tiene que ser"<<endl;
@@ -34,9 +34,12 @@ int main(int argc, char **argv)
 
     ordenador metodoOrde;
     MPI_Init(&argc, &argv);                                               // Arranque del proceso MPI
+    MPI_Comm_size(MPI_COMM_WORLD, &numProcesos);                         /* El comunicador MPI_COMM_WORLD almacena el numero de procesos a ejecutar en la 
+                                                                            variable numProcesos */
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);                             /* El comunicador MPI_COMM_WORLD almacena en la variable my_rank la etiqueta del 
+                                                                            proceso que realiza el llamado. */
 
-
-    int arrayDesorden[128];                                              // Array que almacena todos los numeros en desorden
+    int arrayDesorden[numElementos];                                              // Array que almacena todos los numeros en desorden
     int arrayTemporal[128];                                              // Array que usa cada proceso para guardar los numeros que la raiz envia
     string numeros = "";
     int valor = 0;
