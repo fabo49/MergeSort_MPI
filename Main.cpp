@@ -34,6 +34,7 @@ int main(int argc, char **argv)
     }
 
     ordenador metodoOrde;
+    tamVecTmp = numElementos/numProcesos;               /* Cuantos elementos le tocan a cada proceso */
     MPI_Init(&argc, &argv);                                               // Arranque del proceso MPI
     MPI_Comm_size(MPI_COMM_WORLD, &numProcesos);                         /* El comunicador MPI_COMM_WORLD almacena el numero de procesos a ejecutar en la 
                                                                             variable numProcesos */
