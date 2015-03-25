@@ -12,9 +12,11 @@ using namespace std;
 int main(int argc, char **argv)
 {
 
-    int numProcesos;
-    int numElementos;
+    int numProcesos;            /* Va a guardar la cantidad de procesos que el usuario quiere ejecutar. */
+    int numElementos;           /* Va a guardar la cantidad de elementos que el usuario quiere que tenga el vector*/
     bool compatibles = false;
+
+    //ingreso de datos y comprobacion de compatibilidad
     while(compatibles == false){
         cout<<"Ingrese la cantidad de elementos que quiere en el vector: ";
         cin>>numElementos;
