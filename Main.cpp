@@ -89,12 +89,13 @@ int main(int argc, char **argv)
         vecTemporal = new int[tamVecTmp];
         MPI_Scatter(arrayDesorden, tamVecTmp, MPI_INT, vecTemporal, tamVecTmp, MPI_INT, 0, MPI_COMM_WORLD);  /* El proceso raiz envia a todos los procesos incluido el mismo, los elementos
                                                                                                                 a ordenar inicialmente, es decir, numElementos / numProcesos*/
-        metodoOrde.mergeSort(vecTempral, 0, temVecTmp-1);       /* Ordena la parte que le corresponde al proceso,
+        metodoOrde.mergeSort(vecTempral, 0, tamVecTmp-1);       /* Ordena la parte que le corresponde al proceso,
                                                                    esto es el proceso 0.*/
     }else{
         MPI_Bcast(&tamVecTmp, 1, MPI_INT, 0, MPI_COMM_WORLD);
         vecTemporal = new int[tamVecTmp];
         MPI_Scatter(arrayDesorden, tamVecTmp, vecTemporal, tamVecTmp, MPI_INT, 0, MPI_COMM_WORLD);
+        metodoOrde.mergeSort(vecTemporal, 0, tamVecTmp-1);  /* Ordena lo que le corresponde */
     }
     
     // aqui debe hacerse el primer merge en cada proceso
