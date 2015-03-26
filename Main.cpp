@@ -95,27 +95,23 @@ int main(int argc, char **argv)
         metodoOrde.mergeSort(vecTemporal, 0, tamVecTmp-1);  /* Ordena lo que le corresponde */
     }
     
-    // aqui debe hacerse el primer merge en cada proceso
+    // aqui debe hacerse el merge en cada proceso
     
     iteracion = 1;
-    while(iteracion<numProcesos)
-    {
-        if(my_rank%(2*iteracion)==0)
-        {
-            if(my_rank+iteracion<numProcesos)
-            {
+    while(iteracion < numProcesos){
+        if(my_rank%(2*iteracion) == 0){
+            if(my_rank + iteracion < numProcesos){
                 MPI_Recv(&cantActualProcs,1,MPI_INT,my_rank+iteracion,0,MPI_COMM_WORLD,&estado);
                 vecMerge = new int[cantActualProcs];
                 MPI_Recv(vecMerge,cantActualProcs,MPI_INT,my_rank+iteracion,0,MPI_COMM_WORLD,&estado);
-                chunk = merge(chunk,s,other,m);
+                vecTemporal = metodoOrde.mezcla(vecTemporal,tamVecTmp,vecMerge,cantActualProcs);    /* Hace el merge */
                 tamVecTmp = tamVecTmp+cantActualProcs;
             }
-        }
-        else
-        {
-            int near = id-iteracion;
-            MPI_Send(&s,1,MPI_INT,near,0,MPI_COMM_WORLD);
-            MPI_Send(chunk,s,MPI_INT,near,0,MPI_COMM_WORLD);
+        }else{
+            /* Ahora envio mi parte ordenada a otro proceso para juntar las partes ordenadas */
+            int a_Quien = my_rank-iteracion;
+            MPI_Send(&tamVecTmp,1,MPI_INT,a_Quien,0,MPI_COMM_WORLD);
+            MPI_Send(vecTemporal,tamVecTmp,MPI_INT,a_Quien,0,MPI_COMM_WORLD);
             break;
         }
         iteracion = iteracion*2;
