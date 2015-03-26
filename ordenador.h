@@ -1,11 +1,20 @@
+/**
+  * Universidad de Costa Rica
+  * Escuela de Ciencias de la Computacion e Informatica
+  * Arquitectura de Computadoras
+  * Tarea programada 1
+  * @author Fabian Rodriguez B25695
+  * @author Jose Pablo Ureña B16692
+  * I Semestre 2015
+  * Metodos utilitarios usados por el main para ordenar usando merge sort
+  * y para mezclar ordenadamente dos vectores
+  */
+
 #ifndef ORDENADOR_H
 #define ORDENADOR_H
 
 class ordenador
 {
-private:
-    int mergeSort_re();
-
 public:
     ordenador();
     /**
