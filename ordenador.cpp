@@ -4,7 +4,54 @@ ordenador::ordenador()
 {
 }
 
-void mergeSort(int* vec, int beg, int end)
+int *ordenador::mezcla(int* vecA, int tamaA, int* vecB, int tamaB)
+{
+    int indexA = 0;
+    int indexB = 0;
+    int indexC = 0;
+    int tamaVecC = tamaA+tamaB;         /* Tamaño del nuevo vector */
+    int* vecC = new int[tamaVecC];      /* Vector a retornar */
+
+    while(indexA < tamaA && indexB < tamaB){
+        if(vecA[indexA] <= vecB[indexB]){
+            vecC[indexC] = vecA[indexA];
+            ++indexC;
+            ++indexA;
+        }else{
+            vecC[indexC] = vecB[indexB];
+            ++indexB;
+            ++indexC;
+        }
+    }
+
+    int i = 0;
+    /* Cuando hay un vector mas grande que otro */
+    if(indexA >= tamaA){    // Vector A es mas grande
+        for(i = indexC; i< tamaVecC; ++i){    /* VectorB ya esta ordenado entonces
+                                                 solo tiene que ponerlo en vectorC */
+            vecC[i] = vecB[indexB];
+            ++indexB;
+        }
+    }else{
+        if(indexB >= tamaB){    // Vector B es mas grande
+            for(i = indexC; i< tamaVecC; ++i){    /* VectorA ya esta ordenado entonces
+                                                     solo lo tiene que poner en vectorC */
+                vecC[indexC] = vecA[indexA];
+                ++indexA;
+            }
+        }
+    }
+
+    for(i = 0; i< tamaA; ++i){
+        vecA[i] = vecC[i];
+    }
+    for(i = 0; i< tamaB; ++i){
+        vecB[i] = vecC[tamaA+i];
+    }
+    return vecC;
+}
+
+void ordenador::mergeSort(int* vec, int beg, int end)
 {
     if(beg==end){
         return;

@@ -45,18 +45,14 @@ int main(int argc, char **argv)
     }
 
     ordenador metodoOrde;
-    int etiTamano = numProcesos / 2;                  /* El tamano del vector sera la mitad de cantidad de procesos, ya que se arranca con la union de elementos
-                                                         en la "segunda" vuelta de ordenamiento*/
-    int etiquetaProcesos[etiTamano];                  /* Vector que almacena la etiqueta de los procesos que deben tomar el vector de elementos
-                                                            ya ordenados, de otros procesos.*/
-    for(int k = 0; k < etiTamano; ++k){               // Se llena el vector con las etiquetas de procesos que reciben por primera vez el vector de elementos ordenado
-        etiquetaProcesos[0] = 2*k;
-    }
 
     tamVecTmp = numElementos/numProcesos;               /* Cuantos elementos le tocan a cada proceso */
     int* vecTemporal;                                   /* Array de cada proceso */
-    int arrayDesorden[numElementos];  //** Creo que se tiene que declarar dinamico**     /* Array que almacena todos los numeros en desorden*/
-    int paso;                                           /* Para indicar en cual iteracion (o nivel del arbol) se encuentra */
+    int* arrayDesorden;                                 /* Array que almacena todos los numeros en desorden*/
+    int iteracion;                                      /* Para indicar en cual iteracion (o nivel del arbol) se encuentra */
+    int* vecMerge;                                      /* En este array se van a acomodar los numeros de cada proceso mas los que recibe del otro. */
+    int cantActualProcs;                                /* La cantidad de procesos que le tocan a cada subproceso. */
+    MPI_Status estado;                                  /* Para saber cual es el estado del proceso. */
 
     MPI_Init(&argc, &argv);                                               /* Arranque del proceso MPI */
 
@@ -67,6 +63,7 @@ int main(int argc, char **argv)
 
     if(my_rank==0){                                                      // Proceso raiz 0
 
+        arrayDesorden = new int[numElementos];
         string numeros = "";
         int valor = 0;
         srand(time(NULL));
@@ -100,49 +97,42 @@ int main(int argc, char **argv)
     
     // aqui debe hacerse el primer merge en cada proceso
     
-    /*
-    step = 1;
-    while(step<p)
+    iteracion = 1;
+    while(iteracion<numProcesos)
     {
-        if(id%(2*step)==0)
+        if(my_rank%(2*iteracion)==0)
         {
-            if(id+step<p)
+            if(my_rank+iteracion<numProcesos)
             {
-                MPI_Recv(&m,1,MPI_INT,id+step,0,MPI_COMM_WORLD,&status);
-                other = (int *)malloc(m*sizeof(int));
-                MPI_Recv(other,m,MPI_INT,id+step,0,MPI_COMM_WORLD,&status);
+                MPI_Recv(&cantActualProcs,1,MPI_INT,my_rank+iteracion,0,MPI_COMM_WORLD,&estado);
+                vecMerge = new int[cantActualProcs];
+                MPI_Recv(vecMerge,cantActualProcs,MPI_INT,my_rank+iteracion,0,MPI_COMM_WORLD,&estado);
                 chunk = merge(chunk,s,other,m);
-                s = s+m;
+                tamVecTmp = tamVecTmp+cantActualProcs;
             }
         }
         else
         {
-            int near = id-step;
+            int near = id-iteracion;
             MPI_Send(&s,1,MPI_INT,near,0,MPI_COMM_WORLD);
             MPI_Send(chunk,s,MPI_INT,near,0,MPI_COMM_WORLD);
             break;
         }
-        step = step*2;
+        iteracion = iteracion*2;
     }
-*/
-        
-    }
-    
-    
-    
-    MPI_Finalize();                                                     // Finalización del proceso MPI
-    return 0;
+
+    MPI_Finalize();
 }
 
-
+/*
 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
 0 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30      --   la cantidad de ciclos es n, 2^n = numElementos
-        0 4 8 12 16 20 24 28
-        0 8 16 24                                       -- brinco 1, 3, 7
+0 4 8 12 16 20 24 28
+0 8 16 24                                       -- brinco 1, 3, 7
 0 16
 0
 
-
+*/
 
 
 
