@@ -9,7 +9,7 @@
   * El programa implementa el algoritmo de merge sort con paralelismo y utilizando MPI para el paso de mensajes
   */
 
-#include "OrdenadorElementos.h"
+//#include "OrdenadorElementos.h"
 #include <stdio.h>
 #include <fstream>
 #include <iostream>
@@ -20,6 +20,81 @@
 #include "mpi.h"
 
 using namespace std;
+
+
+int* mezcla(int* vecA, int tamaA, int* vecB, int tamaB)
+{
+    int indexA = 0;
+    int indexB = 0;
+    int indexC = 0;
+    int tamaVecC = tamaA+tamaB;         /* TamaÃ±o del nuevo vector */
+    int* vecC = new int[tamaVecC];      /* Vector a retornar */
+
+    while(indexA < tamaA && indexB < tamaB){
+        if(vecA[indexA] <= vecB[indexB]){
+            vecC[indexC] = vecA[indexA];
+            ++indexC;
+            ++indexA;
+        }else{
+            vecC[indexC] = vecB[indexB];
+            ++indexB;
+            ++indexC;
+        }
+    }
+
+    int i = 0;
+    /* Cuando hay un vector mas grande que otro */
+    if(indexA >= tamaA){    // Vector A es mas grande
+        for(i = indexC; i< tamaVecC; ++i){    /* VectorB ya esta ordenado entonces
+                                                 solo tiene que ponerlo en vectorC */
+            vecC[i] = vecB[indexB];
+            ++indexB;
+        }
+    }else{
+        if(indexB >= tamaB){    // Vector B es mas grande
+            for(i = indexC; i< tamaVecC; ++i){    /* VectorA ya esta ordenado entonces
+                                                     solo lo tiene que poner en vectorC */
+                vecC[indexC] = vecA[indexA];
+                ++indexA;
+            }
+        }
+    }
+
+    for(i = 0; i< tamaA; ++i){
+        vecA[i] = vecC[i];
+    }
+    for(i = 0; i< tamaB; ++i){
+        vecB[i] = vecC[tamaA+i];
+    }
+    return vecC;
+}
+
+void mergeSort(int* vec, int beg, int end)
+{
+    if(beg==end){
+        return;
+    }
+    int mid = (beg+end)/2;
+    mergeSort(vec,beg,mid);
+    mergeSort(vec,mid+1,end);
+    int i=beg,j=mid+1;
+    int l=end-beg+1;
+    int *temp = new int [l];
+    for (int k=0;k<l;k++){
+        if (j>end || (i<=mid && vec[i]<vec[j])){
+            temp[k]=vec[i];
+            i++;
+        }
+        else{
+            temp[k]=vec[j];
+            j++;
+        }
+    }
+    for (int k=0,i=beg;k<l;k++,i++){
+        vec[i]=temp[k];
+    }
+    delete temp;
+}
 
 int main(int argc, char **argv)
 {
@@ -45,7 +120,7 @@ int main(int argc, char **argv)
         }
     }
 
-    ordenador metodoOrde;
+    //ordenador metodoOrde;
 
     tamVecTmp = numElementos/numProcesos;               /* Cuantos elementos le tocan a cada proceso */
     int* vecTemporal;                                   /* Array de cada proceso */
@@ -77,24 +152,30 @@ int main(int argc, char **argv)
         numerosDesorden << "NÃºmeros en desorden: " << endl;
 
         for(int i = 0; i < numElementos; ++i){                                   // Se generan todos los numeros random
-            valor = (i* (rand()%10+1) );
+            valor =  rand()%2000 + 1 ;
             arrayDesorden[i] = valor;
 	    ss << valor;						// Se convierte el entero a string para guardarlo en el archivo
 	    numeros = ss.str();
-            numerosDesorden << numeros+" " << endl;                     // Se llena el archivo con valores random
+            numerosDesorden << numeros+" ";                     // Se llena el archivo con valores random
+	    numeros = "";
+	    ss.str("");						/* Se limpia la variable stringstream*/		
+	    if( (i % 10 == 0) && (i != 0)){
+		numerosDesorden << "\n";
+	    }
+
         }
         
         MPI_Bcast(&tamVecTmp, 1, MPI_INT, 0, MPI_COMM_WORLD);   /* Se encarga de enviarle a cada proceso el numero de elementos que le tocan a ese proceso.*/
         vecTemporal = new int[tamVecTmp];
         MPI_Scatter(arrayDesorden, tamVecTmp, MPI_INT, vecTemporal, tamVecTmp, MPI_INT, 0, MPI_COMM_WORLD);  /* El proceso raiz envia a todos los procesos incluido el mismo, los elementos
                                                                                                                 a ordenar inicialmente, es decir, numElementos / numProcesos*/
-        metodoOrde.mergeSort(vecTemporal, 0, tamVecTmp-1);       /* Ordena la parte que le corresponde al proceso,
+        mergeSort(vecTemporal, 0, tamVecTmp-1);       /* Ordena la parte que le corresponde al proceso,
                                                                    esto es el proceso 0.*/
     }else{
         MPI_Bcast(&tamVecTmp, 1, MPI_INT, 0, MPI_COMM_WORLD);
         vecTemporal = new int[tamVecTmp];
         MPI_Scatter(arrayDesorden, tamVecTmp, MPI_INT, vecTemporal, tamVecTmp, MPI_INT, 0, MPI_COMM_WORLD);
-        metodoOrde.mergeSort(vecTemporal, 0, tamVecTmp-1);  /* Ordena lo que le corresponde */
+        mergeSort(vecTemporal, 0, tamVecTmp-1);  /* Ordena lo que le corresponde */
     }
 
     iteracion = 1;
@@ -104,7 +185,7 @@ int main(int argc, char **argv)
                 MPI_Recv(&cantActualProcs,1,MPI_INT,my_rank+iteracion,0,MPI_COMM_WORLD,&estado);
                 vecMerge = new int[cantActualProcs];
                 MPI_Recv(vecMerge,cantActualProcs,MPI_INT,my_rank+iteracion,0,MPI_COMM_WORLD,&estado);
-                vecTemporal = metodoOrde.mezcla(vecTemporal,tamVecTmp,vecMerge,cantActualProcs);    /* Hace el merge */
+                vecTemporal = mezcla(vecTemporal,tamVecTmp,vecMerge,cantActualProcs);    /* Hace el merge */
                 tamVecTmp = tamVecTmp+cantActualProcs;
             }
         }else{
@@ -133,10 +214,12 @@ int main(int argc, char **argv)
         for(int m = 0; m < numElementos; ++m){                                   /* Se escribe en el archivo todos los numeros en orden */
 	    //ss2 << ;								// Se convierte el entero a string para guardarlo en el archivo
 	    numerosOrdenados = ss2.str();
-            numerosOrden << numerosOrdenados+" " << endl;                     // Se llena el archivo con los valores ordenados
-	    if(m % 10 == 0){
-		numerosOrden << "\n";
+            numerosOrden << numerosOrdenados+" ";                     // Se llena el archivo con los valores ordenados
+	    if( (m % 10 == 0) && (m != 0) ){
+		numerosOrden << endl;
 	    }
+	    ss2.str("");
+	    numerosOrdenados = "";
         }
 
 
