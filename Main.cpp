@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 
     tamVecTmp = numElementos/numProcesos;               /* Cuantos elementos le tocan a cada proceso */
     int* vecTemporal;                                   /* Array de cada proceso */
-    int arrayDesorden[numElementos];                    /* Array que almacena todos los numeros en desorden*/
+    int arrayDesorden[numElementos];  //** Creo que se tiene que declarar dinamico**     /* Array que almacena todos los numeros en desorden*/
     int paso;                                           /* Para indicar en cual iteracion (o nivel del arbol) se encuentra */
 
     MPI_Init(&argc, &argv);                                               /* Arranque del proceso MPI */
@@ -86,7 +86,7 @@ int main(int argc, char **argv)
         // ******** Preguntar si puede especificarse que un proceso reciba de solo una etiqueta
         
         MPI_Bcast(&tamVecTmp, 1, MPI_INT, 0, MPI_COMM_WORLD);   /* Se encarga de enviarle a cada proceso el numero de elementos que le tocan a ese proceso.*/
-        vecTemporal = new int[tamVecTmp];//******** ESTO SE PUEDE? *******
+        vecTemporal = new int[tamVecTmp];
         MPI_Scatter(arrayDesorden, tamVecTmp, MPI_INT, vecTemporal, tamVecTmp, MPI_INT, 0, MPI_COMM_WORLD);  /* El proceso raiz envia a todos los procesos incluido el mismo, los elementos
                                                                                                                 a ordenar inicialmente, es decir, numElementos / numProcesos*/
         metodoOrde.mergeSort(vecTempral, 0, temVecTmp-1);       /* Ordena la parte que le corresponde al proceso,
