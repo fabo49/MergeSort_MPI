@@ -4,7 +4,7 @@
   * Arquitectura de Computadoras
   * Tarea programada 1
   * @author Fabian Rodriguez B25695
-  * @author Jose Pablo Ureña B
+  * @author Jose Pablo Ureña B16692
   * I Semestre 2015
   * El programa implementa el algoritmo de merge sort con paralelismo y utilizando MPI para el paso de mensajes
   */
