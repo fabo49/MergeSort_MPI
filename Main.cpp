@@ -83,14 +83,18 @@ int main(int argc, char **argv)
                                 
         // se hace el receive del vector de elementos , o el envio del vector, luego se modifica el vector con etiquetas
         
-        int bandera = 0;        // Indicador sobre el salto de etiquetas
+        
         for(int j = 0; j < etiTamano; ++j ){             /* Ciclo encargado de modificar el vector etiquetaProcesos, en donde se cambian las diferentes etiquetas                                dentro del mismo conforme avanza el proceso, indicando por medio de las etiquetas cuales procesos 
                                                             van a tomar un vector de elementos ordenado*/
-            if(j = 0 || () ){
+            if(j % 2 != 0 ){
                 
+            }else{
+                send
             }
         }
-        ++bandera;
+        
+        
+        
     }
     
     
