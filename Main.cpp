@@ -34,6 +34,13 @@ int main(int argc, char **argv)
     }
 
     ordenador metodoOrde;
+    int etiTamano = numProcesos / 2;                  /* El tamano del vector sera la mitad de cantidad de procesos, ya que se arranca con la union de elementos
+                                                         en la "segunda" vuelta de ordenamiento*/
+    int etiquetaProcesos[etiTamano];                  /* Vector que almacena la etiqueta de los procesos que deben tomar el vector de elementos
+                                                            ya ordenados, de otros procesos.*/
+    for(int k = 0; k < etiTamano; ++k){               // Se llena el vector con las etiquetas de procesos que reciben por primera vez el vector de elementos ordenado
+        etiquetaProcesos[0] = 2*k;   
+    }
     tamVecTmp = numElementos/numProcesos;               /* Cuantos elementos le tocan a cada proceso */
     MPI_Init(&argc, &argv);                                               // Arranque del proceso MPI
     MPI_Comm_size(MPI_COMM_WORLD, &numProcesos);                         /* El comunicador MPI_COMM_WORLD almacena el numero de procesos a ejecutar en la 
@@ -60,18 +67,47 @@ int main(int argc, char **argv)
             numerosDesorden << numeros+" " << endl;                     // Se llena el archivo con valores random
         }
         
+        // Preguntar si puede especificarse que un proceso reciba de solo una etiqueta
         
-
+        MPI_Scatter(arrayDesorden, tamVecTmp, MPI_INT, );      /* El proceso raiz envia a todos los procesos incluido el mismo, los elementos 
+                                                               a ordenar inicialmente, es decir, numElementos / numProcesos*/
         
-    }else{
-
-        
-
-
     }
+    
+    // aqui debe hacerse el primer merge en cada proceso
+    
+    
+    for(){                  /* Ciclo encargado de regular las vueltas de ordenamiento, es decir, los diferentes niveles en el arbol
+                                construido progresivamente en la union de los vectores con los elementos ordenados, por cada proceso*/
+                                
+                                
+        // se hace el receive del vector de elementos , o el envio del vector, luego se modifica el vector con etiquetas
+        
+        int bandera = 0;        // Indicador sobre el salto de etiquetas
+        for(int j = 0; j < etiTamano; ++j ){             /* Ciclo encargado de modificar el vector etiquetaProcesos, en donde se cambian las diferentes etiquetas                                dentro del mismo conforme avanza el proceso, indicando por medio de las etiquetas cuales procesos 
+                                                            van a tomar un vector de elementos ordenado*/
+            if(j = 0 || () ){
+                
+            }
+        }
+        ++bandera;
+    }
+    
+    
+    
     MPI_Finalize();                                                     // Finalización del proceso MPI
     return 0;
 }
+
+
+0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+0 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30      --   la cantidad de ciclos es n, 2^n = numElementos
+0 4 8 12 16 20 24 28
+0 8 16 24
+0 16
+0
+
+
 
 
 
