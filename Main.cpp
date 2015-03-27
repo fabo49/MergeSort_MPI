@@ -101,9 +101,7 @@ int main(int argc, char **argv)
 
     int numProcesos;            /* Va a guardar la cantidad de procesos que el usuario quiere ejecutar. */
     int numElementos;           /* Va a guardar la cantidad de elementos que el usuario quiere que tenga el vector*/
-    bool compatibles = false;
     int tamVecTmp;              /* Cantidad de elementos que se destinan a cada proceso */
-    tamVecTmp = numElementos/numProcesos;               /* Cuantos elementos le tocan a cada proceso */
     int* vecTemporal;                                   /* Array de cada proceso */
     int* arrayDesorden;                                 /* Array que almacena todos los numeros en desorden*/
     int iteracion;                                      /* Para indicar en cual iteracion (o nivel del arbol) se encuentra */
@@ -119,23 +117,26 @@ int main(int argc, char **argv)
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);                             /* El comunicador MPI_COMM_WORLD almacena en la variable my_rank la etiqueta del
                                                                            proceso que realiza el llamado. */
 
-    if(my_rank==0){                                                      // Proceso raiz 0
 
+    tamVecTmp = numElementos/numProcesos;               /* Cuantos elementos le tocan a cada proceso */
+
+    if(my_rank==0){                                                      // Proceso raiz 0
+        bool compatibles = false;
         arrayDesorden = new int[numElementos];
         string numeros = "";
         int valor = 0;
-	stringstream ss;
+        stringstream ss;
         srand(time(NULL));
 
-     	 cout<<"Ingrese la cantidad de números que desee ordenar: ";
-       	 cin>>numElementos;
-       	 if( (numElementos % numProcesos == 0) ){
-       	     compatibles = true;
-       	 }else{
-       	     cout<<"Los datos ingresados no funcionan, la cantidad de elementos tiene que ser"<<endl;
-       	     cout<<"divisible entre la cantidad de procesos. Vuelva a ingresar los datos"<<endl;
-       	     cout<<"------------------------------------------------------------------------"<<endl;
-       	 }
+        cout<<"Ingrese la cantidad de números que desee ordenar: ";
+        cin>>numElementos;
+        if( (numElementos % numProcesos == 0) ){
+            compatibles = true;
+        }else{
+            cout<<"Los datos ingresados no funcionan, la cantidad de elementos tiene que ser"<<endl;
+            cout<<"divisible entre la cantidad de procesos. Vuelva a ingresar los datos"<<endl;
+            cout<<"------------------------------------------------------------------------"<<endl;
+        }
 
         ofstream numerosDesorden;                                           // Objeto Archivo
         numerosDesorden.open("ListaI.txt");                                 // Se crea el archivo que contiene los numeros en desorden
@@ -144,14 +145,14 @@ int main(int argc, char **argv)
         for(int i = 0; i < numElementos; ++i){                                   // Se generan todos los numeros random
             valor =  rand()%2000 + 1 ;
             arrayDesorden[i] = valor;
-	    ss << valor;						// Se convierte el entero a string para guardarlo en el archivo
-	    numeros = ss.str();
+            ss << valor;						// Se convierte el entero a string para guardarlo en el archivo
+            numeros = ss.str();
             numerosDesorden << numeros+" ";                     // Se llena el archivo con valores random
-	    numeros = "";
-	    ss.str("");						/* Se limpia la variable stringstream*/		
-	    if( (i % 10 == 0) && (i != 0)){
-		numerosDesorden << "\n";
-	    }
+            numeros = "";
+            ss.str("");						/* Se limpia la variable stringstream*/
+            if( (i % 10 == 0) && (i != 0)){
+                numerosDesorden << "\n";
+            }
 
         }
         
@@ -190,35 +191,35 @@ int main(int argc, char **argv)
 
     MPI_Finalize();
 
-    string respuesta;				/* Variable encargada de almacenar la respuesta del usuario sobre una pregunta especifica*/    
+    string respuesta;				/* Variable encargada de almacenar la respuesta del usuario sobre una pregunta especifica*/
 
-	ofstream numerosOrden;                                           // Objeto Archivo
-	string numerosOrdenados;
-	string numerosImprimir;
-	stringstream ss2;						// Nuevo objeto stringstream para casting de valores enteros
-        numerosOrden.open("ListaF.txt");                                 // Se crea el archivo que contiene los numeros en orden
-        numerosOrden << "NÃºmeros en Orden: ";
+    ofstream numerosOrden;                                           // Objeto Archivo
+    string numerosOrdenados;
+    string numerosImprimir;
+    stringstream ss2;						// Nuevo objeto stringstream para casting de valores enteros
+    numerosOrden.open("ListaF.txt");                                 // Se crea el archivo que contiene los numeros en orden
+    numerosOrden << "NÃºmeros en Orden: ";
 
-        for(int m = 0; m < numElementos; ++m){                                   /* Se escribe en el archivo todos los numeros en orden */
-	    ss2 << vecTemporal[m];								// Se convierte el entero a string para guardarlo en el archivo
-	    numerosOrdenados = ss2.str();
-            numerosOrden << numerosOrdenados+" ";                     // Se llena el archivo con los valores ordenados
-	    numerosImprimir = numerosImprimir+" "+numerosOrdenados;
-	    if( (m % 10 == 0) && (m != 0) ){
-		numerosOrden << endl;
-	    }
-	    ss2.str("");
-	    numerosOrdenados = "";
+    for(int m = 0; m < numElementos; ++m){                                   /* Se escribe en el archivo todos los numeros en orden */
+        ss2 << vecTemporal[m];								// Se convierte el entero a string para guardarlo en el archivo
+        numerosOrdenados = ss2.str();
+        numerosOrden << numerosOrdenados+" ";                     // Se llena el archivo con los valores ordenados
+        numerosImprimir = numerosImprimir+" "+numerosOrdenados;
+        if( (m % 10 == 0) && (m != 0) ){
+            numerosOrden << endl;
         }
+        ss2.str("");
+        numerosOrdenados = "";
+    }
 
     cout << "¿Desea observar los números generados aleatoriamente ordenados?(Y/N): ";
     cin >> respuesta;
 
-	    if(respuesta == "Y"){
-		cout << numerosImprimir << endl;		
-	    }	
-	    cout << "La lista de números ordenados se ha almacenado en el archivo: ListaF.txt" << endl;
-	    cout << endl;
+    if(respuesta == "Y"){
+        cout << numerosImprimir << endl;
+    }
+    cout << "La lista de números ordenados se ha almacenado en el archivo: ListaF.txt" << endl;
+    cout << endl;
 
     return 0;
 }

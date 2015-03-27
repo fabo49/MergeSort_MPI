@@ -48,6 +48,7 @@ int *ordenador::mezcla(int* vecA, int tamaA, int* vecB, int tamaB)
     for(i = 0; i< tamaB; ++i){
         vecB[i] = vecC[tamaA+i];
     }
+
     return vecC;
 }
 
