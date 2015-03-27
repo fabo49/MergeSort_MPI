@@ -104,7 +104,6 @@ int main(int argc, char **argv)
     bool compatibles = false;
     int tamVecTmp;              /* Cantidad de elementos que se destinan a cada proceso */
 
-    //ingreso de datos y comprobacion de compatibilidad
     while(compatibles == false){
         cout<<"Ingrese la cantidad de elementos que quiere en el vector: ";
         cin>>numElementos;
@@ -202,19 +201,18 @@ int main(int argc, char **argv)
 
     string respuesta;				/* Variable encargada de almacenar la respuesta del usuario sobre una pregunta especifica*/    
 
-    // llenar el archivo con los numeros ordenados
-
-
 	ofstream numerosOrden;                                           // Objeto Archivo
 	string numerosOrdenados;
+	string numerosImprimir;
 	stringstream ss2;						// Nuevo objeto stringstream para casting de valores enteros
         numerosOrden.open("ListaF.txt");                                 // Se crea el archivo que contiene los numeros en orden
         numerosOrden << "NÃºmeros en Orden: ";
 
         for(int m = 0; m < numElementos; ++m){                                   /* Se escribe en el archivo todos los numeros en orden */
-	    //ss2 << ;								// Se convierte el entero a string para guardarlo en el archivo
+	    ss2 << vecTemporal[m];								// Se convierte el entero a string para guardarlo en el archivo
 	    numerosOrdenados = ss2.str();
             numerosOrden << numerosOrdenados+" ";                     // Se llena el archivo con los valores ordenados
+	    numerosImprimir = numerosImprimir+" "+numerosOrdenados;
 	    if( (m % 10 == 0) && (m != 0) ){
 		numerosOrden << endl;
 	    }
@@ -222,37 +220,14 @@ int main(int argc, char **argv)
 	    numerosOrdenados = "";
         }
 
-
-
     cout << "¿Desea observar los números generados aleatoriamente ordenados?(Y/N): ";
     cin >> respuesta;
 
-    while( (respuesta != "Y") || (respuesta != "N") ){
-
 	    if(respuesta == "Y"){
-		cout << endl;
-		cout << "Los números ordenados son los siguientes: " << endl;
-		for(int f = 0; f < numElementos; ++f){			/* Se imprime el vector ordenado con los numeros*/
-			//cout << " " + vector[f] + " ";
-		}
-		cout << endl;
-		cout << "La lista de números ordenados se ha almacenado en el archivo: ListaF.txt" << endl;
-		cout << endl;
-	    }else{
-		if(respuesta == "N"){
-			cout << endl;
-			cout << "La lista de números ordenados se ha almacenado en el archivo: ListaF.txt" << endl;
-			cout << endl;
-		}else{
-			cout << endl;
-			cout << "No ha digitado una entrada válida, indique (Y/N): " <<endl;
-			cin >> respuesta;
-			cout << endl;
-		}
-	    }
-
-    } /* Fin del ciclo while que pregunta al usuario */
-	
+		cout << numerosImprimir << endl;		
+	    }	
+	    cout << "La lista de números ordenados se ha almacenado en el archivo: ListaF.txt" << endl;
+	    cout << endl;
 
     return 0;
 }
