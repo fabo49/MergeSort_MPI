@@ -103,24 +103,6 @@ int main(int argc, char **argv)
     int numElementos;           /* Va a guardar la cantidad de elementos que el usuario quiere que tenga el vector*/
     bool compatibles = false;
     int tamVecTmp;              /* Cantidad de elementos que se destinan a cada proceso */
-
-    while(compatibles == false){
-        cout<<"Ingrese la cantidad de elementos que quiere en el vector: ";
-        cin>>numElementos;
-        cout<<"\nIngrese la cantidad de procesos que quiere crear para correr el programa: ";
-        cin>>numProcesos;
-        cout<<endl;
-        if( (numElementos % numProcesos == 0) && (numProcesos <= 32) && (numProcesos > 0) && (numElementos > 0) ){
-            compatibles = true;
-        }else{
-            cout<<"Los datos ingresados no funcionan, la cantidad de elementos tiene que ser"<<endl;
-            cout<<"divisible entre la cantidad de procesos. Vuelva a ingresar los datos"<<endl;
-            cout<<"------------------------------------------------------------------------"<<endl;
-        }
-    }
-
-    //ordenador metodoOrde;
-
     tamVecTmp = numElementos/numProcesos;               /* Cuantos elementos le tocan a cada proceso */
     int* vecTemporal;                                   /* Array de cada proceso */
     int* arrayDesorden;                                 /* Array que almacena todos los numeros en desorden*/
@@ -145,8 +127,17 @@ int main(int argc, char **argv)
 	stringstream ss;
         srand(time(NULL));
 
-        ofstream numerosDesorden;                                           // Objeto Archivo
+     	 cout<<"Ingrese la cantidad de números que desee ordenar: ";
+       	 cin>>numElementos;
+       	 if( (numElementos % numProcesos == 0) ){
+       	     compatibles = true;
+       	 }else{
+       	     cout<<"Los datos ingresados no funcionan, la cantidad de elementos tiene que ser"<<endl;
+       	     cout<<"divisible entre la cantidad de procesos. Vuelva a ingresar los datos"<<endl;
+       	     cout<<"------------------------------------------------------------------------"<<endl;
+       	 }
 
+        ofstream numerosDesorden;                                           // Objeto Archivo
         numerosDesorden.open("ListaI.txt");                                 // Se crea el archivo que contiene los numeros en desorden
         numerosDesorden << "NÃºmeros en desorden: " << endl;
 
