@@ -99,9 +99,9 @@ void mergeSort(int* vec, int beg, int end)
 int main(int argc, char **argv)
 {
 
-    int numProcesos;            /* Va a guardar la cantidad de procesos que el usuario quiere ejecutar. */
-    int numElementos;           /* Va a guardar la cantidad de elementos que el usuario quiere que tenga el vector*/
-    int tamVecTmp;              /* Cantidad de elementos que se destinan a cada proceso */
+    int numProcesos;					/* Va a guardar la cantidad de procesos que el usuario quiere ejecutar. */
+    int numElementos;           			/* Va a guardar la cantidad de elementos que el usuario quiere que tenga el vector*/
+    int tamVecTmp;              			/* Cantidad de elementos que se destinan a cada proceso */
     int* vecTemporal;                                   /* Array de cada proceso */
     int* arrayDesorden;                                 /* Array que almacena todos los numeros en desorden*/
     int iteracion;                                      /* Para indicar en cual iteracion (o nivel del arbol) se encuentra */
@@ -118,8 +118,6 @@ int main(int argc, char **argv)
                                                                            proceso que realiza el llamado. */
 
 
-    tamVecTmp = numElementos/numProcesos;               /* Cuantos elementos le tocan a cada proceso */
-
     if(my_rank==0){                                                      // Proceso raiz 0
         bool compatibles = false;
         arrayDesorden = new int[numElementos];
@@ -128,17 +126,22 @@ int main(int argc, char **argv)
         stringstream ss;
         srand(time(NULL));
 
-        cout<<"Ingrese la cantidad de números que desee ordenar: ";
-        cin>>numElementos;
-        if( (numElementos % numProcesos == 0) ){
-            compatibles = true;
-        }else{
-            cout<<"Los datos ingresados no funcionan, la cantidad de elementos tiene que ser"<<endl;
-            cout<<"divisible entre la cantidad de procesos. Vuelva a ingresar los datos"<<endl;
-            cout<<"------------------------------------------------------------------------"<<endl;
-        }
+	while(compatibles == false){
+        	cout<<"Ingrese la cantidad de numeros que desea ordenar: ";
+        	cin>>numElementos;
+        	if( (numElementos % numProcesos == 0) ){
+        	    compatibles = true;
+        	}else{
+        	    cout<<"ERROR!! -- Los datos ingresados no funcionan, la cantidad de elementos"<<endl;
+        	    cout<<"tiene que ser divisible entre la cantidad de procesos. Vuelva a ingresar"<<endl;
+		    cout<<"los datos por favor."<<endl;
+        	    cout<<"----------------------------------------------------------------------------------"<<endl;
+        	}
+	}
 
-        ofstream numerosDesorden;                                           // Objeto Archivo
+    	tamVecTmp = numElementos/numProcesos;				/* Cuantos elementos le tocan a cada proceso */
+        arrayDesorden = (int*)malloc(numElementos*sizeof(int));
+	ofstream numerosDesorden;                                           // Objeto Archivo
         numerosDesorden.open("ListaI.txt");                                 // Se crea el archivo que contiene los numeros en desorden
         numerosDesorden << "NÃºmeros en desorden: " << endl;
 
@@ -155,16 +158,16 @@ int main(int argc, char **argv)
             }
 
         }
-        
+
         MPI_Bcast(&tamVecTmp, 1, MPI_INT, 0, MPI_COMM_WORLD);   /* Se encarga de enviarle a cada proceso el numero de elementos que le tocan a ese proceso.*/
-        vecTemporal = new int[tamVecTmp];
+        vecTemporal = (int*)malloc(tamVecTmp*sizeof(int));
         MPI_Scatter(arrayDesorden, tamVecTmp, MPI_INT, vecTemporal, tamVecTmp, MPI_INT, 0, MPI_COMM_WORLD);  /* El proceso raiz envia a todos los procesos incluido el mismo, los elementos
                                                                                                                 a ordenar inicialmente, es decir, numElementos / numProcesos*/
         mergeSort(vecTemporal, 0, tamVecTmp-1);       /* Ordena la parte que le corresponde al proceso,
                                                                    esto es el proceso 0.*/
     }else{
         MPI_Bcast(&tamVecTmp, 1, MPI_INT, 0, MPI_COMM_WORLD);
-        vecTemporal = new int[tamVecTmp];
+        vecTemporal = (int*)malloc(tamVecTmp*sizeof(int));
         MPI_Scatter(arrayDesorden, tamVecTmp, MPI_INT, vecTemporal, tamVecTmp, MPI_INT, 0, MPI_COMM_WORLD);
         mergeSort(vecTemporal, 0, tamVecTmp-1);  /* Ordena lo que le corresponde */
     }
@@ -174,7 +177,7 @@ int main(int argc, char **argv)
         if(my_rank%(2*iteracion) == 0){
             if(my_rank + iteracion < numProcesos){
                 MPI_Recv(&cantActualProcs,1,MPI_INT,my_rank+iteracion,0,MPI_COMM_WORLD,&estado);
-                vecMerge = new int[cantActualProcs];
+                vecMerge = (int*)malloc(cantActualProcs*sizeof(int));
                 MPI_Recv(vecMerge,cantActualProcs,MPI_INT,my_rank+iteracion,0,MPI_COMM_WORLD,&estado);
                 vecTemporal = mezcla(vecTemporal,tamVecTmp,vecMerge,cantActualProcs);    /* Hace el merge */
                 tamVecTmp = tamVecTmp+cantActualProcs;
@@ -189,8 +192,8 @@ int main(int argc, char **argv)
         iteracion = iteracion*2;
     }
 
-    MPI_Finalize();
-
+if(my_rank == 0){
+	std::cout<<"Termine MPI"<<std::endl;
     string respuesta;				/* Variable encargada de almacenar la respuesta del usuario sobre una pregunta especifica*/
 
     ofstream numerosOrden;                                           // Objeto Archivo
@@ -198,7 +201,7 @@ int main(int argc, char **argv)
     string numerosImprimir;
     stringstream ss2;						// Nuevo objeto stringstream para casting de valores enteros
     numerosOrden.open("ListaF.txt");                                 // Se crea el archivo que contiene los numeros en orden
-    numerosOrden << "NÃºmeros en Orden: ";
+    numerosOrden << "NÃºmeros en Orden: \n";
 
     for(int m = 0; m < numElementos; ++m){                                   /* Se escribe en el archivo todos los numeros en orden */
         ss2 << vecTemporal[m];								// Se convierte el entero a string para guardarlo en el archivo
@@ -212,14 +215,16 @@ int main(int argc, char **argv)
         numerosOrdenados = "";
     }
 
-    cout << "¿Desea observar los números generados aleatoriamente ordenados?(Y/N): ";
+    cout << "Desea observar los numeros generados aleatoriamente ordenados?(Y/N): ";
     cin >> respuesta;
 
     if(respuesta == "Y"){
         cout << numerosImprimir << endl;
     }
-    cout << "La lista de números ordenados se ha almacenado en el archivo: ListaF.txt" << endl;
-    cout << endl;
-
+    		cout << "La lista de números ordenados se ha almacenado en el archivo: ListaF.txt" << endl;
+    		cout << endl;
+	}
+	MPI_Finalize();
     return 0;
 }
+
